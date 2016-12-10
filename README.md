@@ -18,15 +18,15 @@ from December, 2016 onward. The code was based on a fork of core portions of Zom
 1. Install TexturePacker from https://www.codeandweb.com/texturepacker/download . We use this tool during the build for creating spritesheets. For basic info, see https://www.codeandweb.com/texturepacker/documentation
 1. Install the Tiled tilemap editor from https://thorbjorn.itch.io/tiled . The Art/Website team uses this for designing tile maps. The main website is at http://www.mapeditor.org/
 1. Open a Windows console: Windows+R (to open the Run box), then type `cmd` and press Enter.
-1. Create a new folder: `mkdir c:\ZombAttack`
-1. Clone the Git repo to your new folder: `git clone https://github.com/6KidsGames/ZombAttack .`
+1. Create a new folder: `mkdir c:\TeamShipBattle`
+1. Clone the Git repo to your new folder: `git clone https://github.com/6KidsGames/TeamShipBattle .`
 
 ## Every day - syncing code and installing updates
 When you're developing code with a team, you're going to need to get their code as well as upload your code. A good time to do this is at the start of
 each day, unless you're in the middle of something.
 
 1. (If you don't already have a console open) Open a Windows console: Windows+R (to open the Run box), then type `cmd` and press Enter.
-1. Change location to that folder: `cd c:\ZombAttack`
+1. Change location to that folder: `cd c:\TeamShipBattle`
 1. See if you have any files changed locally, and if you're in a working branch: `git status` .
 1. If you are not on the `master` branch, run `git checkout master`
 1. If "package.json" is listed in red, run `git checkout -- package.json`
@@ -44,7 +44,7 @@ When you are done with your changes you'll use GitHub to send the changes for te
 1. Now you're ready to make changes to the code, graphics, sounds, and other parts of the system.
 1. When you have something done that you want to check in, use `git commit -a` and give a good description of the changes you made.
 1. When you are done with everything in your change, it is time to push your code to the cloud (GitHub.com). Use `push`.
-1. Now you can request that the team accept the changes in your topic branch. In your browser go to https://github.com/6KidsGames/ZombAttack and click the `New pull request` button.
+1. Now you can request that the team accept the changes in your topic branch. In your browser go to https://github.com/6KidsGames/TeamShipBattle and click the `New pull request` button.
 1. Select your topic branch name from the list.
 1. On the next page, click the "Create pull request" button.
 1. Add some information into the pull request instructions if you need to, then click "Create pull request"
