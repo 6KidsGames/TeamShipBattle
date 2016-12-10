@@ -1,4 +1,4 @@
-// Main Node.js entry point for ZombAttack.
+// Main Node.js entry point for TeamShipBattle.
 
 'use strict';
 
@@ -8,7 +8,7 @@ const Physics = require('./Physics');
 const Player = require('./Player');
 const Util = require('./Util');
 const Weapon = require('./Weapon');
-const Zombie = require('./Zombie');
+const Alien = require('./Alien');
 const Bullet = require('./Bullet');
 const Telemetry = require('./Telemetry');
 
@@ -20,7 +20,7 @@ var webApp = express();
 
 // Do NOT enable compression - this will greatly add to the per-message
 // latency of high-speed messages during the game.
-// Example latencies - 20 zombies in world, WebSockets transport, BinaryPack transform, 5 connected clients:
+// Example latencies - 20 aliens in world, WebSockets transport, BinaryPack transform, 5 connected clients:
 //   - With compression: 70-85 ms
 //   - Compression off: 0-3 ms 
 //var compression = require('compression');  // Compress content returned through HTTP.
@@ -51,13 +51,13 @@ var primusOptions = {
   // Message size info gathered 9/3/2016 (after message size optimizations added):
   // JSON:
   // - First world msg 83
-  // - 1 zombie 166
-  // - ~70 bytes per additional zombie
+  // - 1 alien 166
+  // - ~70 bytes per additional alien
   //
   // Binary:
   // - First world msg: 55
-  // - 1 zombie 108
-  // - ~45 bytes per additional zombie
+  // - 1 alien 108
+  // - ~45 bytes per additional alien
   parser: 'binary',  // 'JSON',  
 };
 var primusServer = new primus(httpServer, primusOptions);
@@ -68,7 +68,7 @@ var serverStartTime = (new Date()).getTime();
 // Server-side object tracking.
 var currentPlayers = { };  // Maps from spark ID (string) to PlayerInfo server data structure..
 function forEachPlayer(func) { Util.forEachInMap(currentPlayers, func); }
-var currentZombies = [ ];
+var currentAliens = [ ];
 var currentWeapons = [ ];
 let currentBullets = [ ];
 var currentLevel = Level.chooseLevel();
@@ -146,30 +146,30 @@ function worldUpdateLoop() {
     currentWeapons.push(Weapon.spawnWeapon(currentLevel, currentTime));
   }
 
-  if (currentZombies.length < Zombie.MaxZombies &&
+  if (currentAliens.length < Alien.MaxAliens &&
       Util.getRandomInt(0, 250 / numConnectedPlayers) === 0) {
     // TODO: Don't spawn within easy reach of players' current positions.
-    currentZombies.push(Zombie.spawnZombie(currentLevel, currentTime));
+    currentAliens.push(Alien.spawnAlien(currentLevel, currentTime));
   }
 
-  let zombiesToRemove = [];
-  currentZombies.forEach(zombieInfo => {
-    if (Zombie.updateZombie(zombieInfo, currentTime, currentLevel)) {
-      zombiesToRemove.push(zombieInfo);
+  let aliensToRemove = [];
+  currentAliens.forEach(alienInfo => {
+    if (Alien.updateAlien(alienInfo, currentTime, currentLevel)) {
+      aliensToRemove.push(alienInfo);
     }
     else {
-      worldUpdateMessage.z.push(zombieInfo.zombie);  // Send only the client-side data structure.
+      worldUpdateMessage.a.push(alienInfo.alien);  // Send only the client-side data structure.
     }
   });
-  zombiesToRemove.forEach(deadZombieInfo => currentZombies.remove(deadZombieInfo));
+  aliensToRemove.forEach(deadAlienInfo => currentAliens.remove(deadAlienInfo));
 
   let bulletsToRemove = [];
   currentBullets.forEach(bulletInfo => {
     if (!Bullet.updateBullet(bulletInfo, currentTime, currentLevel)) {
       bulletsToRemove.push(bulletInfo);
     } else {
-      let bulletHitAZombie = currentZombies.some(zombieInfo => Zombie.checkBulletHit(zombieInfo, bulletInfo, currentTime, currentLevel));
-      if (bulletHitAZombie) {
+      let bulletHitAAlien = currentAliens.some(alienInfo => Alien.checkBulletHit(alienInfo, bulletInfo, currentTime, currentLevel));
+      if (bulletHitAAlien) {
         bulletsToRemove.push(bulletInfo);
       } else {
         worldUpdateMessage.b.push(bulletInfo.bullet);  // Send only the client-side data structure.
@@ -197,26 +197,26 @@ function worldUpdateLoop() {
             playerInfo.lastWeaponUse = currentTime;
             player.wC++;  // Increment so client knows that current weapon is being used.
 
-            // Melee weapons differ from ranged weapons - strike nearest zombie if close enough.
-            let zombieDistances = [];
-            currentZombies.forEach(zombieInfo => {
-              if (!zombieInfo.dead) {
-                zombieDistances.push({ zombieInfo: zombieInfo, sqrDist: Physics.sqrDistanceCircles(zombieInfo.modelCircle, playerInfo.modelCircle) });
+            // Melee weapons differ from ranged weapons - strike nearest alien if close enough.
+            let alienDistances = [];
+            currentAliens.forEach(alienInfo => {
+              if (!alienInfo.dead) {
+                alienDistances.push({ alienInfo: alienInfo, sqrDist: Physics.sqrDistanceCircles(alienInfo.modelCircle, playerInfo.modelCircle) });
               }
             });
-            if (zombieDistances.length > 0) {
-              zombieDistances.sort((a, b) => a.sqrDist - b.sqrDist);
-              let closestZombie = zombieDistances[0];
+            if (alienDistances.length > 0) {
+              alienDistances.sort((a, b) => a.sqrDist - b.sqrDist);
+              let closestAlien = alienDistances[0];
               let sqrWeaponRange = weaponStats.rangePx * weaponStats.rangePx;
-              Log.debug(`Melee: Closest Z ${closestZombie.sqrDist}, we can hit out to ${sqrWeaponRange}`);
-              if (closestZombie.sqrDist <= sqrWeaponRange) {
+              Log.debug(`Melee: Closest A ${closestAlien.sqrDist}, we can hit out to ${sqrWeaponRange}`);
+              if (closestAlien.sqrDist <= sqrWeaponRange) {
                 // TODO - add in logic to only hit in front of player instead of in any direction.
-                //let angle = Math.atan2(closestZombie.zombie.modelCircle.y - playerInfo.modelCircle.y,
-                //  closestZombie.zombie.modelCircle.x - playerInfo.modelCircle.x);
+                //let angle = Math.atan2(closestAlien.alien.modelCircle.y - playerInfo.modelCircle.y,
+                //  closestAlien.alien.modelCircle.x - playerInfo.modelCircle.x);
                 //const halfFrontalArc = Math.PI / 3;
                 //if (angle >= -halfFrontalArc && angle <= halfFrontalArc) {
-                  Zombie.hitByPlayer(closestZombie.zombieInfo, weaponStats, currentTime);
-                  Log.debug(`Z${closestZombie.zombieInfo.zombie.id} hit, remainingHealth ${closestZombie.zombieInfo.zombie.h}`);
+                  Alien.hitByPlayer(closestAlien.alienInfo, weaponStats, currentTime);
+                  Log.debug(`A${closestAlien.alienInfo.alien.id} hit, remainingHealth ${closestAlien.alienInfo.alien.h}`);
                 //}
               }
             } 
@@ -255,9 +255,9 @@ function worldUpdateLoop() {
       Player.updatePlayer(playerInfo, currentTime);
     }
 
-    currentZombies.forEach(zombieInfo => {
-      if (Zombie.isBiting(zombieInfo, playerInfo, currentTime)) {
-        Player.hitByZombie(playerInfo, currentTime);
+    currentAliens.forEach(alienInfo => {
+      if (Alien.isBiting(alienInfo, playerInfo, currentTime)) {
+        Player.hitByAlien(playerInfo, currentTime);
       }
     });
     
@@ -284,7 +284,7 @@ function worldUpdateLoop() {
   }
 
   let processingTimeMsec = (new Date()).getTime() - currentTime;
-  Telemetry.sendServerLoopStats(processingTimeMsec, currentZombies.length);
+  Telemetry.sendServerLoopStats(processingTimeMsec, currentAliens.length);
   if (processingTimeMsec > 50) {
     Log.warning(`Excessive loop processing time: ${processingTimeMsec} ms`);
   }
@@ -298,7 +298,7 @@ function createEmptyWorldUpdateMessage() {
     lW: currentLevel.widthPx,
     lH: currentLevel.heightPx,
     p: [],  // Players
-    z: [],  // Zombies
+    a: [],  // Aliens
     w: [],  // Weapons
     b: [],  // Bullets
   };

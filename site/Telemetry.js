@@ -20,7 +20,7 @@ let currentIntervalTracker = {
   cloneWorldMsec: 0,
   cloneWorldMsecSamples: 0,
 
-  zombieCount: 0,
+  alienCount: 0,
   usersConnected: 0,
 };
 
@@ -41,8 +41,8 @@ function init() {
   // in the environment we don't talk to AppInsights at all (setup() throws an exception).
   //
   // In Azure (portal.azure.com) there are two AppInsights keys for use here:
-  // - ZombAttackDev - for local testing
-  // - ZombAttackPROD - for production deployment
+  // - TeamShipBattleDev - for local testing
+  // - TeamShipBattlePROD - for production deployment
   let appInsightsKey = process.env.APPINSIGHTS_INSTRUMENTATIONKEY;
   if (appInsightsKey) {
     AppInsights.setup().start();
@@ -54,14 +54,14 @@ function init() {
   }
 }
 
-function sendServerLoopStats(serverLoopProcessingTimeMsec, numZombies) {
+function sendServerLoopStats(serverLoopProcessingTimeMsec, numAliens) {
   if (appInsightsClient) {
     // Average counters.
     currentIntervalTracker.serverLoopTime += serverLoopProcessingTimeMsec;
     currentIntervalTracker.serverLoopTimeSamples++;
 
     // Max counters.
-    currentIntervalTracker.zombieCount = Math.max(currentIntervalTracker.zombieCount, numZombies);
+    currentIntervalTracker.alienCount = Math.max(currentIntervalTracker.alienCount, numAliens);
     currentIntervalTracker.usersConnected = Math.max(currentIntervalTracker.usersConnected, currentConnectedUserCount);
 
     let now = (new Date()).getTime();
@@ -81,7 +81,7 @@ function sendIntervalStats() {
     sendOneMetric("CloneWorldMsec", currentIntervalTracker["cloneWorldMsec"], currentIntervalTracker["cloneWorldMsecSamples"]);
 
     // Max counters
-    sendOneMetric("ZombieCount", currentIntervalTracker.zombieCount);
+    sendOneMetric("AlienCount", currentIntervalTracker.alienCount);
     sendOneMetric("UsersConnected", currentIntervalTracker.usersConnected);
   }
 }

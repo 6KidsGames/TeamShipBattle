@@ -16,7 +16,7 @@ exit /b 1
 @echo %_env% Deployment
 @echo Checking out Deploy%_env% branch which is configured in
 @echo Azure App Service to automatically deploy to the %_env%
-@echo ZombAttack site.
+@echo TeamShipBattle site.
 @echo =================================================================
 call git checkout Deploy%_env%
 if ERRORLEVEL 1 echo ERROR: Git checkout failed && exit /b 1

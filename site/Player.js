@@ -111,7 +111,7 @@ function updatePlayer(playerInfo, currentTime) {
   playerInfo.player.a = playerInfo.currentWeapon.currentAmmo;
 }
 
-function hitByZombie(playerInfo, currentTime) {
+function hitByAlien(playerInfo, currentTime) {
   let player = playerInfo.player;
   player.h -= 1;
   if (player.h <= 0) {
@@ -172,6 +172,6 @@ function dropWeapon(playerInfo, weaponTracker) {
 module.exports.spawnPlayer = spawnPlayer;
 module.exports.updatePlayer = updatePlayer;
 module.exports.updatePlayerFromClientControls = updatePlayerFromClientControls;
-module.exports.hitByZombie = hitByZombie;
+module.exports.hitByAlien = hitByAlien;
 module.exports.pickedUpWeapon = pickedUpWeapon;
 module.exports.dropWeapon = dropWeapon;

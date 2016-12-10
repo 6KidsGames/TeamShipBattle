@@ -1,9 +1,9 @@
 {
-  "name": "ZombAttack",
+  "name": "TeamShipBattle",
   "description": "6KidsGames project for Summer 2016",
   "version": "1.0.0",
-  "homepage": "https://github.com/6KidsGames/ZombAttack",
-  "repository": "https://github.com/6KidsGames/ZombAttack.git",
+  "homepage": "https://github.com/6KidsGames/TeamShipBattle",
+  "repository": "https://github.com/6KidsGames/TeamShipBattle.git",
   "author": "6 Kids Games https://github.com/6KidsGames",
   "tags": [],
   "files": [],

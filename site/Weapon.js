@@ -4,7 +4,7 @@ const Util = require('./Util');
 const Log = require('./Log');
 const Physics = require('./Physics');
 
-// If the zombie and the player model circles are just touching, the centers are 32 pixels distance
+// If the alien and the player model circles are just touching, the centers are 32 pixels distance
 // from each other. So the bare-minimum distance for a melee weapon is this far,
 // then we add in any extra small range we want to allow based on the length of the weapon.
 const minMeleeStrikeDistance = 16 + 16;
@@ -32,7 +32,7 @@ function getWeaponStats(weaponName) {
   return WeaponTypes.find(w => w.name === weaponName);
 }
 
-// Creates a map from a number in the range of 0..totalZombieProbability to the zombie type
+// Creates a map from a number in the range of 0..totalAlienProbability to the alien type
 // to use if that number is chosen randomly.
 let totalWeaponProbability = 0;
 function createWeaponProbabilityNap() {

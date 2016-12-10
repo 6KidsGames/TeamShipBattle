@@ -1,6 +1,6 @@
 # TeamShipBattle - 6KidsGames Winter 2017 Project
 
-![6KidsGames Logo](https://github.com/6KidsGames/ZombAttack/blob/master/Sprites/6KidsLogo.png "6KidsGames")
+![6KidsGames Logo](https://github.com/6KidsGames/TeamShipBattle/blob/master/Sprites/6KidsLogo.png "6KidsGames")
 
 # About This Repo
 This repo contains the second large-scale game created by the kid-developers at 6 Kids Games,

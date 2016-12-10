@@ -1,29 +1,29 @@
-// Zombie-related code.
+// Alien-related code.
 
 const Physics = require('./Physics');
 const Util = require('./Util');
 const Log = require('./Log');
 const Level = require('./Level');
 
-// We have to limit the number of zombies in the world at one time to avoid excessive costs in
+// We have to limit the number of aliens in the world at one time to avoid excessive costs in
 // sending world state updates.
-const MaxZombies = 20;
+const MaxAliens = 20;
 
 // Reduce transmission sizes by sending only integers over the wire, mapped to costume names.
 // CODESYNC: Numeric values are mapped in index.html back to costume names.
-const ZombieCostumeIDs = {
+const AlienCostumeIDs = {
   "crawler_": 0,
-  "vcrawlerzombie": 1,
-  "czombie_": 2,
-  "vnormalzombie": 3,
+  "vcrawleralien": 1,
+  "calien_": 2,
+  "vnormalalien": 3,
 };
 
-// Zombie information by type, including attributes like speed and costume.
-const ZombieTypes = [
-  { type: "Crawler", probability: 10, hitPoints: 5, speedPxFrame: 1, costumes: [ "crawler_", "vcrawlerzombie" ] },
-  { type: "Shambler", probability: 10,  hitPoints: 7, speedPxFrame: 3, costumes: [ "czombie_", "vnormalzombie" ] },
-  { type: "Walker", probability: 10, hitPoints: 10, speedPxFrame: 5, costumes: [ "czombie_", "vnormalzombie" ] },
-  { type: "Runner", probability: 10, hitPoints: 15, speedPxFrame: 10, costumes: [ "czombie_", "vnormalzombie" ] },
+// Alien information by type, including attributes like speed and costume.
+const AlienTypes = [
+  { type: "Crawler", probability: 10, hitPoints: 5, speedPxFrame: 1, costumes: [ "crawler_", "vcrawleralien" ] },
+  { type: "Shambler", probability: 10,  hitPoints: 7, speedPxFrame: 3, costumes: [ "calien_", "vnormalalien" ] },
+  { type: "Walker", probability: 10, hitPoints: 10, speedPxFrame: 5, costumes: [ "calien_", "vnormalalien" ] },
+  { type: "Runner", probability: 10, hitPoints: 15, speedPxFrame: 10, costumes: [ "calien_", "vnormalalien" ] },
 ];
 
 // Sound file references for growls. On the client a common
@@ -32,119 +32,119 @@ const ZombieTypes = [
 const numGrowlSounds = 2;
 const numHurtSounds = 1;
 
-const zombieMaxTurnPerFrameRadians = 0.4;
-const zombieHurtPauseMsec = 500;
-const zombieDeadLingerMsec = 300;
+const alienMaxTurnPerFrameRadians = 0.4;
+const alienHurtPauseMsec = 500;
+const alienDeadLingerMsec = 300;
 
-// Creates a map from a number in the range of 0..totalZombieProbability to the zombie type
+// Creates a map from a number in the range of 0..totalAlienProbability to the alien type
 // to use if that number is chosen randomly.
-let totalZombieProbability = 0;
-function createZombieProbabilityNap() {
+let totalAlienProbability = 0;
+function createAlienProbabilityNap() {
   let probMap = { };
   let currentProb = 0;
-  ZombieTypes.forEach(zombieType => {
-    totalZombieProbability += zombieType.probability;
-    for (let i = 0; i < zombieType.probability; i++) {
-      probMap[currentProb] = zombieType;
+  AlienTypes.forEach(alienType => {
+    totalAlienProbability += alienType.probability;
+    for (let i = 0; i < alienType.probability; i++) {
+      probMap[currentProb] = alienType;
       currentProb++;
     }
   });
   return probMap;
 }
-const zombieProbabilityMap = createZombieProbabilityNap();
+const alienProbabilityMap = createAlienProbabilityNap();
 
-const zombieMinTimeMsecBetweenGrowls = 12 * 1000;
-const zombieGrowlProbabilityPerSec = 0.05;
+const alienMinTimeMsecBetweenGrowls = 12 * 1000;
+const alienGrowlProbabilityPerSec = 0.05;
 const maxOutstandingGrowls = 1;
 const outstandingGrowlTimeWindowMsec = 6000;
 let previousGrowlTimes = createInitialGrowlTimes();
-let nextZombieNumber = 0;
+let nextAlienNumber = 0;
 
-function spawnZombie(level, currentTime) {
-  let zombieID = nextZombieNumber;
-  nextZombieNumber++;
+function spawnAlien(level, currentTime) {
+  let alienID = nextAlienNumber;
+  nextAlienNumber++;
 
   let x = Util.getRandomInt(32, level.widthPx - 32);
   let y = Util.getRandomInt(32, level.heightPx - 32);
 
-  let randomZombieNumber = Util.getRandomInt(0, totalZombieProbability);
-  let zombieType = zombieProbabilityMap[randomZombieNumber];
+  let randomAlienNumber = Util.getRandomInt(0, totalAlienProbability);
+  let alienType = alienProbabilityMap[randomAlienNumber];
 
-  // A ZombieInfo is the server-side data structure containing all needed server tracking information.
+  // A AlienInfo is the server-side data structure containing all needed server tracking information.
   // Only a subset of this information is passed to the clients, to minimize wire traffic.
-  let zombieInfo = {
+  let alienInfo = {
     modelCircle: Physics.circle(x, y, 16),
     lastGrowlTime: currentTime,
     lastBiteTime: currentTime,
     lastHurtTime: 0,
     dead : false,
     deadAt: 0,
-    type: zombieType,
+    type: alienType,
 
     // The portion of the data structure we send to the clients.
-    zombie: {
-      id: zombieID,
+    alien: {
+      id: alienID,
 
-      // Place the zombie in a random location on the map.
-      // TODO: Account for the contents of the underlying tile - only place zombies into locations that
+      // Place the alien in a random location on the map.
+      // TODO: Account for the contents of the underlying tile - only place aliens into locations that
       // make sense, or at map-specific spawn points.
       x: x,
       y: y,
       d: Util.getRandomFloat(0, 2 * Math.PI),
-      h: zombieType.hitPoints,
-      c: ZombieCostumeIDs[zombieType.costumes[Util.getRandomInt(0, zombieType.costumes.length)]],
+      h: alienType.hitPoints,
+      c: AlienCostumeIDs[alienType.costumes[Util.getRandomInt(0, alienType.costumes.length)]],
       s: 0,  // When sC (soundCount) is increased, this is the sound index to play.
-      sC: 0,  // Incremented whenever the zombie growls or is hurt. Used by the client to know when to play a sound.
+      sC: 0,  // Incremented whenever the alien growls or is hurt. Used by the client to know when to play a sound.
     }
   };
 
-  return zombieInfo;
+  return alienInfo;
 }
 
 // Called on the world update loop.
 // currentTime is the current Unix epoch time (milliseconds since Jan 1, 1970).
-// Returns false if the zombie remains in the world, or true if the zombie is dead
+// Returns false if the alien remains in the world, or true if the alien is dead
 // and should be removed.
-function updateZombie(zombieInfo, currentTime, level) {
-  if (zombieInfo.dead) {
-    if (currentTime - zombieInfo.deadAt >= zombieDeadLingerMsec) {
+function updateAlien(alienInfo, currentTime, level) {
+  if (alienInfo.dead) {
+    if (currentTime - alienInfo.deadAt >= alienDeadLingerMsec) {
       return true;
     }
     return false;
   }
   
-  if ((currentTime - zombieInfo.lastHurtTime) < zombieHurtPauseMsec) {
-    // Zombie paused for a moment since it got hurt. It does not move or growl for a little while.
+  if ((currentTime - alienInfo.lastHurtTime) < alienHurtPauseMsec) {
+    // Alien paused for a moment since it got hurt. It does not move or growl for a little while.
     return false;
   }
 
-  let zombie = zombieInfo.zombie;
+  let alien = alienInfo.alien;
 
   // AI: Random walk. Turn some amount each frame, and go that way to the maximum possible distance allowed
-  // (based on the zombie's speed).
-  let angleChange = Util.getRandomFloat(-zombieMaxTurnPerFrameRadians, zombieMaxTurnPerFrameRadians);
-  zombie.d += angleChange;
+  // (based on the alien's speed).
+  let angleChange = Util.getRandomFloat(-alienMaxTurnPerFrameRadians, alienMaxTurnPerFrameRadians);
+  alien.d += angleChange;
 
-  let speedPxPerFrame = zombieInfo.type.speedPxFrame;
-  zombie.x -= speedPxPerFrame * Math.sin(zombie.d);
-  zombie.y += speedPxPerFrame * Math.cos(zombie.d);
-  Level.clampPositionToLevel(level, zombie);
-  zombieInfo.modelCircle.centerX = zombie.x;
-  zombieInfo.modelCircle.centerY = zombie.y;
+  let speedPxPerFrame = alienInfo.type.speedPxFrame;
+  alien.x -= speedPxPerFrame * Math.sin(alien.d);
+  alien.y += speedPxPerFrame * Math.cos(alien.d);
+  Level.clampPositionToLevel(level, alien);
+  alienInfo.modelCircle.centerX = alien.x;
+  alienInfo.modelCircle.centerY = alien.y;
 
   // Occasional growls. We tell all the clients to use the same growl sound to get a nice
   // echo effect if people are playing in the same room.
   // We also limit to at most a couple of growls started in a sliding time window, to
   // avoid speaker and CPU overload at the client, and excessive updates across the network. 
-  let msecSinceLastGrowl = currentTime - zombieInfo.lastGrowlTime; 
-  if (msecSinceLastGrowl > zombieMinTimeMsecBetweenGrowls) {
-    let growlProbabilityInMsec = msecSinceLastGrowl * zombieGrowlProbabilityPerSec;
+  let msecSinceLastGrowl = currentTime - alienInfo.lastGrowlTime; 
+  if (msecSinceLastGrowl > alienMinTimeMsecBetweenGrowls) {
+    let growlProbabilityInMsec = msecSinceLastGrowl * alienGrowlProbabilityPerSec;
     if (Util.getRandomInt(0, msecSinceLastGrowl) < growlProbabilityInMsec) {
       if (registerGrowl(currentTime)) {
-        let zombie = zombieInfo.zombie;
-        zombie.s = Util.getRandomInt(0, numGrowlSounds);  // Growl sounds are at the head of the client's sound array
-        zombie.sC++;
-        zombieInfo.lastGrowlTime = currentTime;
+        let alien = alienInfo.alien;
+        alien.s = Util.getRandomInt(0, numGrowlSounds);  // Growl sounds are at the head of the client's sound array
+        alien.sC++;
+        alienInfo.lastGrowlTime = currentTime;
       } 
     }
   }
@@ -152,20 +152,19 @@ function updateZombie(zombieInfo, currentTime, level) {
   return false;
 }
 
-function hitByPlayer(zombieInfo, weaponStats, currentTime) {
-  let zombie = zombieInfo.zombie;
-  zombie.h -= weaponStats.damage;
-  Log.debug(`Z${zombie.id} hit, ${weaponStats.damage} damage, ${zombie.h} hp remaining`)
-  if (zombie.h <= 0) {
-    // TODO: Zombie is dead, what animation and sound to send to the client, and what state machine for death (e.g. blood puddle, spurt particles, ...)
-    zombieInfo.dead = true;
-    zombieInfo.deadAt = currentTime;
+function hitByPlayer(alienInfo, weaponStats, currentTime) {
+  let alien = alienInfo.alien;
+  alien.h -= weaponStats.damage;
+  Log.debug(`A${alien.id} hit, ${weaponStats.damage} damage, ${alien.h} hp remaining`)
+  if (alien.h <= 0) {
+    alienInfo.dead = true;
+    alienInfo.deadAt = currentTime;
   } else {
-    zombieInfo.lastHurtTime = currentTime;
+    alienInfo.lastHurtTime = currentTime;
     
     // Pick a hurt sound to play. Hurt sounds come after growls in the client's sound array.
-    zombie.s = numGrowlSounds + Util.getRandomInt(0, numHurtSounds);
-    zombie.sC++;
+    alien.s = numGrowlSounds + Util.getRandomInt(0, numHurtSounds);
+    alien.sC++;
   }
 }
 
@@ -181,15 +180,15 @@ function registerGrowl(currentTime) {
   return false;
 }
 
-function isBiting(zombieInfo, playerInfo, currentTime) {
-  if (zombieInfo.dead) {
+function isBiting(alienInfo, playerInfo, currentTime) {
+  if (alienInfo.dead) {
     return false;
   }
-  let msecSinceLastBite = currentTime - zombieInfo.lastBiteTime;
+  let msecSinceLastBite = currentTime - alienInfo.lastBiteTime;
   if (msecSinceLastBite >= 1000) {
-    if (Physics.hitTestCircles(playerInfo.modelCircle, zombieInfo.modelCircle)) {
-      // Log.debug(`Z${zombieInfo.zombie.id}: Biting ${playerInfo.player.id}`);
-      zombieInfo.lastBiteTime = currentTime;
+    if (Physics.hitTestCircles(playerInfo.modelCircle, alienInfo.modelCircle)) {
+      // Log.debug(`A${alienInfo.alien.id}: Biting ${playerInfo.player.id}`);
+      alienInfo.lastBiteTime = currentTime;
       return true;
     }
   }
@@ -204,15 +203,15 @@ function createInitialGrowlTimes() {
   return a;
 }
 
-// Returns true if the bullet hit the zombie, indicating that the bullet
-// disappears from the world, the zombie takes damage, and a hit sound is played.
-function checkBulletHit(zombieInfo, bulletInfo, currentTime) {
-  if (zombieInfo.dead) {
+// Returns true if the bullet hit the alien, indicating that the bullet
+// disappears from the world, the alien takes damage, and a hit sound is played.
+function checkBulletHit(alienInfo, bulletInfo, currentTime) {
+  if (alienInfo.dead) {
     return false;
   }
-  if (Physics.hitTestCircles(bulletInfo.modelCircle, zombieInfo.modelCircle)) {
-    Log.debug(`B${bulletInfo.bullet.id} hit Z${zombieInfo.zombie.id}`);
-    hitByPlayer(zombieInfo, bulletInfo.weaponStats, currentTime);
+  if (Physics.hitTestCircles(bulletInfo.modelCircle, alienInfo.modelCircle)) {
+    Log.debug(`B${bulletInfo.bullet.id} hit A${alienInfo.alien.id}`);
+    hitByPlayer(alienInfo, bulletInfo.weaponStats, currentTime);
     return true;
   }
   return false;
@@ -221,9 +220,9 @@ function checkBulletHit(zombieInfo, bulletInfo, currentTime) {
 
 // --------------------------------------------------------------------
 // Exports
-module.exports.spawnZombie = spawnZombie;
-module.exports.updateZombie = updateZombie;
+module.exports.spawnAlien = spawnAlien;
+module.exports.updateAlien = updateAlien;
 module.exports.isBiting = isBiting;
 module.exports.hitByPlayer = hitByPlayer;
 module.exports.checkBulletHit = checkBulletHit;
-module.exports.MaxZombies = MaxZombies;
+module.exports.MaxAliens = MaxAliens;
