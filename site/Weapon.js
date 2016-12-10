@@ -61,7 +61,7 @@ function spawnWeapon(level, currentTime) {
   let randomWeaponNumber = Util.getRandomInt(0, totalWeaponProbability);
   let weaponType = weaponProbabilityMap[randomWeaponNumber];
 
-  Log.debug(`Creating weapon ${weaponType.name}, number ${weaponType.number}`);
+  Log.debug(`Creating ${weaponType.name} W${weaponType.number}`);
 
   // A WeaponInfo is the server-side data structure containing all needed server tracking information.
   // Only a subset of this information is passed to the clients, to minimize wire traffic.

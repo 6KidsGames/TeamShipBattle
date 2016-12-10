@@ -6,12 +6,9 @@
   <title>Team Ship Battle</title>
   <link rel="stylesheet" href="//cdn.jsdelivr.net/normalize/3.0.1/normalize.min.css">
   <script src="/primus/primus.js"></script>
-  <script src="/scripts/hexi.min.js"></script>
-  <style>
-    body { padding: 5px }
-  </style>
+  <script src="/scripts/hexi.js"></script>
 </head>
-<body>  
+<body>
   <script>
     // Track the latest world updates from the server's world update messages.
     // We start with an empty world until the server can get a first message
@@ -49,15 +46,15 @@
     var alienSounds = [];
     var characterInfo = [
       {
-        costumeFrames: hexiObj.spriteUtilities.frameSeries(0, 1, "vplayer"),
+        costumeFrames: hexiObj.spriteUtilities.frameSeries(0, 1, "player"),
         hurtSounds: [],
       },
       {
-        costumeFrames: hexiObj.spriteUtilities.frameSeries(0, 1, "playerE0"),
+        costumeFrames: hexiObj.spriteUtilities.frameSeries(0, 1, "player"),
         hurtSounds: [],
       },
       {
-        costumeFrames: hexiObj.spriteUtilities.frameSeries(0, 1, "playerE1"),
+        costumeFrames: hexiObj.spriteUtilities.frameSeries(0, 1, "player"),
         hurtSounds: [],
       },
     ];
@@ -273,7 +270,7 @@
 
     // Keep a record of all aliens in play right now.
     var alienDatas = { };
-    function forEachAlienData(func) { forEachInMap(allienDatas, func); }
+    function forEachAlienData(func) { forEachInMap(alienDatas, func); }
 
     // Keep a record of all bullets in play right now.
     var bulletDatas = { };
@@ -365,10 +362,10 @@
           playerData.lastSoundCount = player.sC;
           playersToPlayOuchSound.push(player);
 
-          // Create a blood spray using particles.
+          // Create a spark spray using particles.
           hexiObj.createParticles(
             player.x, player.y,
-            () => hexiObj.circle(8, "red"),
+            () => hexiObj.circle(8, "blue"),
             levelWorldObj,
             10,  // Num particles
             0,  // Gravity
@@ -431,8 +428,8 @@
           playerDeathSprite = hexiObj.rectangle(
             window.innerWidth,
             window.innerHeight,
-            "black",  // <fillColor></fillColor>
-            "black",  // lineColor
+            "white",  // <fillColor></fillColor>
+            "white",  // lineColor
             0,  // lineWidth 
             0,  // xPosition 
             0);  // yPosition
@@ -442,7 +439,7 @@
           var deathMessageSprite = hexiObj.text(
               "You died.\nRefresh to respawn.",
               "40px sans-serif",
-              "white",
+              "black",
               0, 0);
           deathMessageSprite.layer = 10000;  // Above the fade-out.
           hexiObj.stage.putCenter(deathMessageSprite);
@@ -571,23 +568,23 @@
           }
         }
 
-        var bloodParticles = 0;
+        var damageParticles = 0;
         if (alien.h <= 0) {
           if (!alienData.dead) {
             alienData.dead = true;
             console.log(`A${alien.id} dead`);
-            bloodParticles = 20;
+            damageParticles = 20;
           }
         } else if (alienHurt) {
-          bloodParticles = 8; 
+          damageParticles = 8; 
         }
-        if (bloodParticles > 0) {
-          // Create a blood spray using particles.
+        if (damageParticles > 0) {
+          // Create a spark spray using particles.
           hexiObj.createParticles(
             alien.x, alien.y,
-            () => hexiObj.circle(8, "black"),
+            () => hexiObj.circle(8, "yellow"),
             levelWorldObj,
-            bloodParticles,  // Num particles
+            damageParticles,  // Num particles
             0,  // Gravity
             false,  // randomSpacing
             0, 6.28,  // Min/max angle - allow whole circle
@@ -664,7 +661,8 @@
     }
 
     function createNewPlayerSprite(weaponNumber) {
-      var sprite = hexiObj.sprite(hexiObj.spriteUtilities.frameSeries(0, 1, "vplayer"), 0, 0);
+      var series = hexiObj.spriteUtilities.frameSeries(0, 1, "player");
+      var sprite = hexiObj.sprite(series, 0, 0);
 
       // Add to the tile world so its position remains relative to that world.
       levelWorldObj.addChild(sprite);
@@ -680,7 +678,6 @@
       weapon.anchor.y = 0.5;
       weapon.layer = 101;
       sprite.addChild(weapon);
-    
 
       return sprite;
     }
@@ -693,10 +690,7 @@
     // Map from alien costume numbers into texture names.
     // CODESYNC: Numeric keys are mapped in Alien.js.
     var AlienCostumeIDMap = {
-      0: "crawler_",
-      1: "vcrawleralien",
-      2: "calien_",
-      3: "vnormalalien",
+      0: "alien1_",
     }; 
 
     function createNewBulletSprite(serverBulletInfo) {
@@ -714,8 +708,7 @@
 
     function createNewAlienSprite(serverAlienInfo) {
       var costumeName = AlienCostumeIDMap[serverAlienInfo.c];
-      console.log("Creating Z" + serverAlienInfo.id + " with costume " + costumeName +
-          " at (" + serverAlienInfo.x + "," + serverAlienInfo.y + ")");
+      console.log(`Creating A${serverAlienInfo.id} with costume ${costumeName} at (${serverAlienInfo.x},${serverAlienInfo.y})`);
       var sprite = hexiObj.sprite(hexiObj.spriteUtilities.frameSeries(0, 1, costumeName), serverAlienInfo.x, serverAlienInfo.y);
 
       // Add to the tile world so its position remains relative to that world.
@@ -733,14 +726,14 @@
     // Map from weapon numbers into texture names and sounds.
     // CODESYNC: Numeric keys are mapped in Weapon.js.
     var WeaponNumberMap = {
-      0: { sprite: "vdagger",     attackSound: "Sounds/swoosh.mp3", playerHolding: "playerdagger", yPos: -14 },
-      1: { sprite: "vHalligan",   attackSound: "Sounds/swoosh.mp3", playerHolding: "PlayerHalliganTool", yPos: -14 },
-      2: { sprite: "vsword",      attackSound: "Sounds/swoosh.mp3", playerHolding: "PlayerSword", yPos: -16 },
-      3: { sprite: "vchainsaw",   attackSound: "Sounds/chainsawawesome.mp3", playerHolding: "PlayerChainsaw", yPos: -14 },
-      4: { sprite: "vpistol",     attackSound: "Sounds/pistol.mp3", playerHolding: "PlayerPistol", yPos: -14},
-      5: { sprite: "vrifle",      attackSound: "Sounds/rifle.mp3", playerHolding: "playerRifle", yPos: -14 }, 
-      6: { sprite: "vmachinegun", attackSound: "Sounds/machinegun.mp3", playerHolding: "playerMachineGun", yPos: -14},
-      7: { sprite: "vminigun",    attackSound: "Sounds/miniGun.mp3", playerHolding: "playerMiniGun", yPos: -14 },
+      0: { sprite: "weapon1",   attackSound: "Sounds/test.mp3", playerHolding: "weapon1", yPos: -14 },
+      1: { sprite: "weapon1",   attackSound: "Sounds/test.mp3", playerHolding: "weapon1", yPos: -14 },
+      2: { sprite: "weapon1",      attackSound: "Sounds/test.mp3", playerHolding: "weapon1", yPos: -16 },
+      3: { sprite: "weapon1",   attackSound: "Sounds/test.mp3", playerHolding: "weapon1", yPos: -14 },
+      4: { sprite: "weapon1",     attackSound: "Sounds/test.mp3", playerHolding: "weapon1", yPos: -14},
+      5: { sprite: "weapon1",      attackSound: "Sounds/test.mp3", playerHolding: "weapon1", yPos: -14 }, 
+      6: { sprite: "weapon1", attackSound: "Sounds/test.mp3", playerHolding: "weapon1", yPos: -14},
+      7: { sprite: "weapon1",    attackSound: "Sounds/test.mp3", playerHolding: "weapon1", yPos: -14 },
     };
 
     function createNewWeaponSprite(serverWeaponInfo) {

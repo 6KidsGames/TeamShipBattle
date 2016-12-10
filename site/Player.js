@@ -8,7 +8,7 @@ const Weapon = require('./Weapon');
 
 const playerMaxTurnPerFrameRadians = 0.3;
 const playerSpeedPxPerFrame = 10;
-const playerOuchSoundsPerCharacter = 2;
+const playerOuchSoundsPerCharacter = 1;
 const numCharacters = 3;
 
 // Returns a new PlayerInfo object. Called at connection of the client, before

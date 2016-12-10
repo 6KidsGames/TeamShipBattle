@@ -12,24 +12,21 @@ const MaxAliens = 20;
 // Reduce transmission sizes by sending only integers over the wire, mapped to costume names.
 // CODESYNC: Numeric values are mapped in index.html back to costume names.
 const AlienCostumeIDs = {
-  "crawler_": 0,
-  "vcrawleralien": 1,
-  "calien_": 2,
-  "vnormalalien": 3,
+  "6KidsLogo": 0,
 };
 
 // Alien information by type, including attributes like speed and costume.
 const AlienTypes = [
-  { type: "Crawler", probability: 10, hitPoints: 5, speedPxFrame: 1, costumes: [ "crawler_", "vcrawleralien" ] },
-  { type: "Shambler", probability: 10,  hitPoints: 7, speedPxFrame: 3, costumes: [ "calien_", "vnormalalien" ] },
-  { type: "Walker", probability: 10, hitPoints: 10, speedPxFrame: 5, costumes: [ "calien_", "vnormalalien" ] },
-  { type: "Runner", probability: 10, hitPoints: 15, speedPxFrame: 10, costumes: [ "calien_", "vnormalalien" ] },
+  { type: "Ugly", probability: 10, hitPoints: 5, speedPxFrame: 1, costumes: [ "6KidsLogo", "6KidsLogo" ] },
+  { type: "Noisy", probability: 10,  hitPoints: 7, speedPxFrame: 3, costumes: [ "6KidsLogo", "6KidsLogo" ] },
+  { type: "Slimy", probability: 10, hitPoints: 10, speedPxFrame: 5, costumes: [ "6KidsLogo", "6KidsLogo" ] },
+  { type: "Slug", probability: 10, hitPoints: 15, speedPxFrame: 10, costumes: [ "6KidsLogo", "6KidsLogo" ] },
 ];
 
 // Sound file references for growls. On the client a common
 // sound array has growls followed by hurt sounds.
 // CODESYNC: index.html keeps the list.
-const numGrowlSounds = 2;
+const numGrowlSounds = 1;
 const numHurtSounds = 1;
 
 const alienMaxTurnPerFrameRadians = 0.4;
