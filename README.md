@@ -19,6 +19,7 @@ from December, 2016 onward. The code was based on a fork of core portions of Zom
 1. Install the Tiled tilemap editor from https://thorbjorn.itch.io/tiled . The Art/Website team uses this for designing tile maps. The main website is at http://www.mapeditor.org/
 1. Open a Windows console: Windows+R (to open the Run box), then type `cmd` and press Enter.
 1. Create a new folder: `mkdir c:\TeamShipBattle`
+1. Change to the folder: `cd c:\TeamShipBattle`
 1. Clone the Git repo to your new folder: `git clone https://github.com/6KidsGames/TeamShipBattle .`
 
 ## Every day - syncing code and installing updates
