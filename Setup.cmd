@@ -1,5 +1,5 @@
 @echo off
-rem ScratchPlus Summer 2016 project - setup script for Windows consoles.
+rem Setup script for Windows consoles.
 rem Can be run over and over if you need to. If you see it change when
 rem you do a git pull, you should run it again to pull down any Node.js
 rem NPM packages or perform other setups.
