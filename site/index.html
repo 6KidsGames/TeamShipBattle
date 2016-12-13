@@ -44,20 +44,7 @@
     hexiObj.start();
 
     var alienSounds = [];
-    var characterInfo = [
-      {
-        costumeFrames: hexiObj.spriteUtilities.frameSeries(0, 1, "player"),
-        hurtSounds: [],
-      },
-      {
-        costumeFrames: hexiObj.spriteUtilities.frameSeries(0, 1, "player"),
-        hurtSounds: [],
-      },
-      {
-        costumeFrames: hexiObj.spriteUtilities.frameSeries(0, 1, "player"),
-        hurtSounds: [],
-      },
-    ];
+    var characterInfo = [];
 
     // User interface spites and tracking info.
     var playerHealthSprite = undefined;
@@ -66,7 +53,6 @@
     var playerAmmoSprite = undefined;
     var playerDeathSprite = undefined;
     var playerDeathStart = 0;
-
     function hexiLoading() {
       hexiObj.loadingBar();
     }
@@ -78,12 +64,15 @@
       alienSounds[0] = hexiObj.sound('Sounds/test.mp3');
 
       // CODESYNC: The number of sounds here is set in RunNodeSiteServer.js numPlayerHurtSounds
+      characterInfo[0].costumeFrames = hexiObj.spriteUtilities.frameSeries(0, 1, "player");
       characterInfo[0].hurtSounds = [
         hexiObj.sound('Sounds/test.mp3'),
       ]; 
+      characterInfo[1].costumeFrames = hexiObj.spriteUtilities.frameSeries(0, 1, "player");
       characterInfo[1].hurtSounds = [
         hexiObj.sound('Sounds/test.mp3'),
       ];
+      characterInfo[2].costumeFrames = hexiObj.spriteUtilities.frameSeries(0, 1, "player");
       characterInfo[2].hurtSounds = [
         hexiObj.sound('Sounds/test.mp3'),
       ];
