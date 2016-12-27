@@ -21,8 +21,8 @@ var thingsToLoadIntoHexi = [
   "Sounds/test.mp3",
 
   // Spritesheet and tileset JSON metadata files and related PNGs.
-  'images/TeamShipBattleSpritesheet.json',
-  'images/TeamShipBattleTileset.png',
+  'images/GameSpritesheet.json',
+  'images/LevelTileset.png',
 
   // Game map definitions in Tiled Editor (http://mapeditor.org) comma-separated value (CSV) JSON
   // format, suitable for use with Hexi's GameUtilities.
@@ -313,7 +313,7 @@ function gameLoop() {
   if (currentLevelName !== currentWorld.l) {
     console.log(`Loading level ${currentWorld.l}`);
     currentLevelName = currentWorld.l;
-    levelWorldObj = hexiObj.makeTiledWorld("Levels/" + currentWorld.l + ".json", 'images/TeamShipBattleTileset.png');
+    levelWorldObj = hexiObj.makeTiledWorld("Levels/" + currentWorld.l + ".json", 'images/LevelTileset.png');
     levelWorldObj.layer = 0;  // Rearmost.
   }
 

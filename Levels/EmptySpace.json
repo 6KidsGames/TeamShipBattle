@@ -19,11 +19,11 @@
         {
          "columns":1,
          "firstgid":1,
-         "image":"..\/out\/site\/images\/TeamShipBattleTileset.png",
+         "image":"..\/out\/site\/images\/LevelTileset.png",
          "imageheight":64,
          "imagewidth":64,
          "margin":0,
-         "name":"TeamShipBattleTileset",
+         "name":"LevelTileset",
          "spacing":0,
          "tilecount":1,
          "tileheight":64,

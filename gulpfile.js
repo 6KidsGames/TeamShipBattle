@@ -187,11 +187,11 @@ gulp.task('browserify-convert-es6-to-es5-minify-sourcemap', ['copy-site-content'
 })
 
 gulp.task('assemble-tileset', [ 'clean'], function() {
-  return runTexturePacker('TeamShipBattleTileset', Paths.TilesRoot, 64);
+  return runTexturePacker('LevelTileset', Paths.TilesRoot, 64);
 });
 
 gulp.task('assemble-spritesheet', ['clean'], function() {
-  return runTexturePacker('TeamShipBattleSpritesheet', Paths.SpritesRoot);
+  return runTexturePacker('GameSpritesheet', Paths.SpritesRoot);
 });
 
 // http://andrewconnell.com/blog/running-mocha-tests-with-visual-studio-code
