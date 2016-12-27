@@ -276,22 +276,22 @@ var lastProcessedWorldUpdate = createEmptyWorldUpdate();
 // or new or removed players. This is also our record for keeping track
 // of all the things the game engine needs (e.g. sprites).
 var playerDatas = { };
-function forEachPlayerData(func) { forEachInMap(playerDatas, func); }
+function forEachPlayerData(func) { Util.forEachInMap(playerDatas, func); }
 
 // Keep a record of all un-picked-up weapons we know about right now. Each time
 // through gameLoop() the latest world update might include different
 // or new or removed weapons. This is also our record for keeping track
 // of all the things the game engine needs (e.g. sprites).
 var weaponDatas = { };
-function forEachWeaponData(func) { forEachInMap(weaponDatas, func); }
+function forEachWeaponData(func) { Util.forEachInMap(weaponDatas, func); }
 
 // Keep a record of all aliens in play right now.
 var alienDatas = { };
-function forEachAlienData(func) { forEachInMap(alienDatas, func); }
+function forEachAlienData(func) { Util.forEachInMap(alienDatas, func); }
 
 // Keep a record of all bullets in play right now.
 var bulletDatas = { };
-function forEachBulletData(func) { forEachInMap(bulletDatas, func); }
+function forEachBulletData(func) { Util.forEachInMap(bulletDatas, func); }
 
 // Keep track of the local player's weapon change ID - we increment this each time the player
 // actually presses a weapon key so the server knows that the controlInfo.w value was updated.
@@ -426,7 +426,7 @@ function gameLoop() {
   }
 
   playersToPlayOuchSound.forEach(player => {
-    playSound(characterInfo[player.n].hurtSounds[player.s], player, myPlayerData.sprite);
+    playSound(characterInfo[player.n].hurtSounds[player.s], myPlayerData.sprite, player);
   });
   playerDatasToPlayWeaponSound.forEach(playerData => {
       // Play the sound related to the weapon.
@@ -782,10 +782,10 @@ function createEmptyWorldUpdate() {
 }
 
 function clearAllMapTouches(map) {
-  forEachInMap(map, function(val) { val.touched = false; });
+  Util.forEachInMap(map, function(val) { val.touched = false; });
 }
 
-// Plays a sound with attenuation based on distance, and pan effect based on relative postion on screen.
+// Plays a sound with attenuation based on distance, and pan effect based on relative position on screen.
 // Consider the following 4 quadrants:
 //
 // Up, left    |    Up, right
@@ -832,17 +832,4 @@ function playSound(soundObj, playerPos, soundPos) {
   soundObj.restart();
   soundObj.volume = volume;
   soundObj.pan = pan;
-}
-
-function forEachInMap(map, func) {
-  var ids = Object.keys(map);
-  for (var i = 0; i < ids.length; i++) {
-    var id = ids[i];
-    if (map.hasOwnProperty(id)) {
-      var val = map[id]; 
-      if (val) {
-        func(val);
-      }
-    }
-  }
 }
