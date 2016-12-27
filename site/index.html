@@ -1,8 +1,8 @@
 <!doctype html>
-<!-- Based on Echo sample from Primus. -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Team Ship Battle</title>
   <link rel="stylesheet" href="//cdn.jsdelivr.net/normalize/3.0.1/normalize.min.css">
   <script src="/primus/primus.js"></script>
@@ -53,6 +53,12 @@
     var playerAmmoSprite = undefined;
     var playerDeathSprite = undefined;
     var playerDeathStart = 0;
+    var forwardButton = undefined;
+    var backButton = undefined;
+    var leftButton = undefined;
+    var rightButton = undefined;
+    var shootButton = undefined;
+
     function hexiLoading() {
       hexiObj.loadingBar();
     }
@@ -174,9 +180,30 @@
       playerAmmoSprite.layer = 1000;  // Foremost
       playerAmmoSprite.visible = false;
 
-      copyrightSprite = hexiObj.text("Copyright 2017 6KidsGames.com", "16px sans-serif", "white", 10, 625);
+      var copyrightHeightPx = 16;
+      copyrightSprite = hexiObj.text("Copyright 2017 6KidsGames.com", `${copyrightHeightPx}px sans-serif`, "white", 10, hexiObj.canvas.height - copyrightHeightPx - 1);
       copyrightSprite.alpha = 0.4;
       copyrightSprite.layer = 1000;
+
+      forwardButton = hexiObj.button(["ForwardButton"], 74, hexiObj.canvas.height - copyrightHeightPx - 1 - 3 - 64 - 32 - 64);
+      forwardButton.alpha = 0.5;
+      forwardButton.layer = 1000;  // Foremost
+
+      backButton = hexiObj.button(["BackButton"], 74, hexiObj.canvas.height - copyrightHeightPx - 1 - 3 - 64);
+      backButton.alpha = 0.5;
+      backButton.layer = 1000;  // Foremost
+
+      leftButton = hexiObj.button(["LeftButton"], 10, hexiObj.canvas.height - copyrightHeightPx - 1 - 3 - 64 - 32);
+      leftButton.alpha = 0.5;
+      leftButton.layer = 1000;  // Foremost
+
+      rightButton = hexiObj.button(["RightButton"], 106, hexiObj.canvas.height - copyrightHeightPx - 1 - 3 - 64 - 32);
+      rightButton.alpha = 0.5;
+      rightButton.layer = 1000;  // Foremost
+
+      shootButton = hexiObj.button(["ShootButton"], hexiObj.canvas.width - 10 - 96, hexiObj.canvas.height - copyrightHeightPx - 1 - 3 - 64 - 48);
+      shootButton.alpha = 0.5;
+      shootButton.layer = 1000;  // Foremost
 
       hexiObj.state = gameLoop;
     }
@@ -609,10 +636,15 @@
       // Control keys don't change anything locally, we send to the server and it
       // determines what happens.
       if (keyPressed[KEY_W]) { controlInfo.F = true; }  // Forward
+      if (forwardButton.state === "down") { controlInfo.F = true; }  // Forward
       if (keyPressed[KEY_S]) { controlInfo.B = true; }  // Back
-      if (keyPressed[KEY_A]) { controlInfo.L = true; }  // Left 
+      if (backButton.state === "down") { controlInfo.B = true; }  // Backward
+      if (keyPressed[KEY_A]) { controlInfo.L = true; }  // Left
+      if (leftButton.state === "down") { controlInfo.L = true; }  // Left
       if (keyPressed[KEY_D]) { controlInfo.R = true; }  // Right
+      if (rightButton.state === "down") { controlInfo.R = true; }  // Right
       if (keyPressed[KEY_SPACE]) { controlInfo.A = true; }  // Attack
+      if (shootButton.state === "down") { controlInfo.A = true; }  // Attack
       for (var i = KEY_1; i <= KEY_9; i++) {
         if (keyPressed[i]) {
           //console.log("Weapon change key:", i - KEY_1);
